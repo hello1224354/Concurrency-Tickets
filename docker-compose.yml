@@ -1,0 +1,33 @@
+version: "3.8"
+
+services:
+  # 1. Thằng quản lý dữ liệu cứng (Database)
+  postgres:
+    image: postgres:15-alpine
+    container_name: ticket_postgres
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: secretpassword
+      POSTGRES_DB: ticketing_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  # 2. Thằng quản lý vé trên RAM (Cache)
+  redis:
+    image: redis:7-alpine
+    container_name: ticket_redis
+    ports:
+      - "6379:6379"
+
+  # 3. Thằng điều phối hàng đợi (Message Queue)
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: ticket_rabbitmq
+    ports:
+      - "5672:5672" # Cổng để code Node.js của bạn chui vào
+      - "15672:15672" # Cổng để bạn xem giao diện quản lý trên web
+
+volumes:
+  pgdata:
