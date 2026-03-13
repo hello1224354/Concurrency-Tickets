@@ -17,6 +17,8 @@ export const startWorker = async () => {
 
     await channel.assertQueue("ticket_queue", { durable: true });
 
+    channel.prefetch(1);
+
     channel.consume("ticket_queue", async (msg: any) => {
       if (msg !== null) {
         try {
@@ -27,11 +29,6 @@ export const startWorker = async () => {
             data.userId,
           ]);
 
-          console.log(
-            `✅ [Worker] Đã chốt đơn cho ${data.userId} vào DB an toàn!`,
-          );
-
-          // Báo cho RabbitMQ biết là "Tao xử lý xong cục này rồi, mày xóa nó khỏi hàng chờ đi"
           channel.ack(msg);
         } catch (err) {
           console.error("❌ [Worker] Lỗi trong quá trình ghi sổ:", err);
